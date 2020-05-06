@@ -1,88 +1,52 @@
 import React, { useState } from 'react';
+import Team from './Team';
+
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
-import Player from './Player';
-import { makeStyles } from '@material-ui/core';
 import { v4 as uuid } from 'uuid';
+import { useQuery } from 'react-query';
+import { useAuth0 } from '../react-auth0-spa';
+import { getTeams } from '../utils/service';
 
-const newPlayer = {
-  firstName: '',
-  lastName: '',
-  phoneNumber: '',
-  email: '',
-  type: '',
+const newTeam = {
+  teamName: '',
+  players: [],
 };
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  disabledInput: {
-    color: theme.palette.text.primary,
-  },
-}));
-const Teams = () => {
-  const [players, setPlayers] = useState([]);
-  const [teamName, setTeamName] = useState('test');
-  const [editName, setEditName] = useState(true);
-  const classes = useStyles();
 
-  const handleTeamName = (e) => {
-    setTeamName(e.target.value);
+const Teams = (props) => {
+  const { user, loading } = useAuth0();
+  const [teams, setTeams] = useState([]);
+
+  const userSub = loading ? '' : user.sub;
+  const { status, data, error } = useQuery(userSub, getTeams);
+
+  const addTeam = () => {
+    setTeams([...teams, { ...newTeam, teamId: uuid(), userId: userSub }]);
   };
-  const addPlayer = () => {
-    setPlayers([...players, { ...newPlayer, id: uuid() }]);
+  const removeEditTemp = (teamId) => {
+    const savedEditRemoved = teams.filter((team) => team.teamId !== teamId);
+    setTeams(savedEditRemoved);
   };
-  const removePlayer = (id) => {
-    const playerRemoved = players.filter((player) => player.id !== id);
-    setPlayers(playerRemoved);
-  };
-  const updatePlayer = (updatedPlayer) => {
-    const withUpdated = players.map((player) => (player.id === updatedPlayer.id ? updatedPlayer : player));
-    setPlayers(withUpdated);
-  };
-  console.log(players);
+
+  if (status === 'loading' || loading) {
+    return <div>loading</div>;
+  } else if (status === 'error') {
+    return <div>{error.message}</div>;
+  }
+
   return (
-    <>
-      <Grid container spacing={3}>
-        <Grid item xs={6}>
-          <TextField
-            required
-            id="teamName"
-            name="teamName"
-            label="Team name"
-            value={teamName}
-            onChange={handleTeamName}
-            disabled={editName}
-            fullWidth
-            InputProps={{ classes: { disabled: classes.disabledInput } }}
-          />
+    <Grid container spacing={3}>
+      {[...data.response.Items, ...teams].map((team) => (
+        <Grid key={team.teamId} item xs={12}>
+          <Team {...props} team={team} removeEditTemp={removeEditTemp}></Team>
         </Grid>
-        <Grid item xs={6}>
-          <Button variant="outlined" color="primary" onClick={() => setEditName(!editName)}>
-            {editName ? 'Edit' : 'Save'}
-          </Button>
-        </Grid>
-
-        {players.map((player) => (
-          <Grid key={player.id} item xs={6}>
-            <Paper className={classes.paper}>
-              <Player person={player} removePlayer={removePlayer} updatePlayer={updatePlayer} />
-            </Paper>
-          </Grid>
-        ))}
+      ))}
+      <Grid item xs={6}>
+        <Button variant="contained" color="primary" onClick={addTeam}>
+          Add Team
+        </Button>
       </Grid>
-      <Grid container spacing={3}>
-        <Grid item xs={6}>
-          <Button variant="contained" color="primary" onClick={addPlayer}>
-            Add Player
-          </Button>
-        </Grid>
-      </Grid>
-    </>
+    </Grid>
   );
 };
 

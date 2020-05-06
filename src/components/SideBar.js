@@ -3,9 +3,9 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import DashboardIcon from '@material-ui/icons/Dashboard';
+import PersonIcon from '@material-ui/icons/Person';
 import IconButton from '@material-ui/core/IconButton';
-import BarChartIcon from '@material-ui/icons/BarChart';
+import GroupIcon from '@material-ui/icons/Group';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import Cancel from '@material-ui/icons/Cancel';
 import Divider from '@material-ui/core/Divider';
@@ -71,30 +71,18 @@ const SideBar = ({ handleDrawerClose, open }) => {
       </div>
       <Divider />
       <List>
-        <ListItem button>
-          <ListItemIcon>
-            <DashboardIcon />
-          </ListItemIcon>
-          <ListItemText primary="Dashboard" />
-        </ListItem>
-        <NavLink to="/home/teams" activeClassName={classes.activeLink} className={classes.link}>
+        <NavLink to="/home" activeClassName={classes.activeLink} className={classes.link}>
           <ListItem button>
             <ListItemIcon>
-              <BarChartIcon />
+              <GroupIcon />
             </ListItemIcon>
             <ListItemText primary="Teams" />
           </ListItem>
         </NavLink>
-        <ListItem button>
-          <ListItemIcon>
-            <BarChartIcon />
-          </ListItemIcon>
-          <ListItemText primary="Game Status" />
-        </ListItem>
         <NavLink to="/home/profile" activeClassName={classes.activeLink} className={classes.link}>
           <ListItem button>
             <ListItemIcon>
-              <BarChartIcon />
+              <PersonIcon />
             </ListItemIcon>
             <ListItemText primary="Profile" />
           </ListItem>

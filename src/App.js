@@ -6,6 +6,7 @@ import SignIn from './components/SignIn';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Dashboard from './components/Dashboard';
 import { makeStyles } from '@material-ui/core/styles';
+import UpdateStatus from './components/UpdateStatus';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,6 +21,7 @@ const App = () => {
       <Router history={history}>
         <Switch>
           <Route path="/" exact component={SignIn} />
+          <Route path="/statusUpdate" component={UpdateStatus} />
           <PrivateRoute path="/home" component={Dashboard} />
         </Switch>
       </Router>

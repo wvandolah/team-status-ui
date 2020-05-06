@@ -6,9 +6,10 @@ import Profile from './Profile';
 import Teams from './Teams';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
+import SendStatus from './SendStatus';
+import CheckStatus from './CheckStatus';
 
 const useStyles = makeStyles((theme) => {
-  console.log(theme);
   return {
     content: {
       flexGrow: 1,
@@ -38,9 +39,10 @@ const Dashboard = ({ match }) => {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-          <Route path={`${match.path}`} exact />
+          <Route path={`${match.path}`} component={Teams} exact />
           <Route path={`${match.path}/profile`} component={Profile} />
-          <Route path={`${match.path}/teams`} component={Teams} />
+          <Route path={`${match.path}/send`} component={SendStatus} />
+          <Route path={`${match.path}/status`} component={CheckStatus} />
         </Container>
       </main>
     </>

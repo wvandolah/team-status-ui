@@ -1,0 +1,104 @@
+import React, { useState } from 'react';
+import { useQuery } from 'react-query';
+import { useAuth0 } from '../react-auth0-spa';
+import Player from './Player';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import { DateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
+import { getTeam, postNotifications } from '../utils/service';
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    padding: theme.spacing(2),
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  grid: {
+    padding: theme.spacing(2),
+  },
+}));
+const SendStatus = ({ location, history }) => {
+  const teamId = location.state ? location.state.teamId : '';
+  const userId = location.state ? location.state.userId : '';
+  const { status, data, error } = useQuery([teamId, { userId: userId }], getTeam);
+  const [check, setCheck] = useState({});
+  const [hasSent, setHasSent] = useState(false);
+  const [selectedDate, handleDateChange] = useState(new Date());
+  const { loading } = useAuth0();
+  const classes = useStyles();
+  const handleChecked = (event) => {
+    setCheck({ ...check, [event.target.name]: event.target.checked });
+  };
+
+  const handleSend = async () => {
+    try {
+      const teamData = data.response.Items[0];
+      const sendPlayers = teamData.players.filter((player) => check[player.id]);
+      const sendData = {
+        teamId: teamData.teamId,
+        teamName: teamData.teamName,
+        dateTime: selectedDate,
+        players: sendPlayers,
+      };
+      const returned = await postNotifications(sendData);
+      console.log(returned);
+      if (returned.status === 201) {
+        setHasSent(true);
+      }
+    } catch (e) {
+      console.log(e.response);
+    }
+  };
+
+  if (teamId === '') {
+    history.push('/home');
+  }
+  if (status === 'loading' || loading) {
+    return <div>loading</div>;
+  } else if (status === 'error') {
+    return <div>{error.message}</div>;
+  } else if (data.response.Items.length < 1) {
+    history.push('/home');
+    return <div></div>;
+  }
+
+  return hasSent ? (
+    <div>sent</div>
+  ) : (
+    <Grid container spacing={3} className={classes.grid}>
+      <Grid item xs={12}>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <DateTimePicker
+            label="DateTimePicker"
+            inputVariant="outlined"
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
+        </MuiPickersUtilsProvider>
+      </Grid>
+
+      {data.response.Items[0].players.map((player) => (
+        <Grid key={player.id} item xs={12} sm={6}>
+          <Paper className={classes.paper} elevation={3}>
+            <Player
+              person={player}
+              isSendStatus
+              handleChecked={handleChecked}
+              isChecked={check[player.id] ? true : false}
+            />
+          </Paper>
+        </Grid>
+      ))}
+      <Grid item xs={12}>
+        <Button variant="contained" color="secondary" onClick={handleSend}>
+          Send Notification Messages
+        </Button>
+      </Grid>
+    </Grid>
+  );
+};
+
+export default SendStatus;
