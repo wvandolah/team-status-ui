@@ -31,14 +31,15 @@ const UpdateStatus = () => {
   const [playerData, setPlayerData] = useState({});
   const [postError, setPostError] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const teamId = query.get('teamId');
-  const playerId = query.get('playerId');
-  const gameId = query.get('gameId');
+  const teamId = query.get('t');
+  const playerId = query.get('p');
+  const gameId = query.get('g');
   const { status, data, error } = useQuery([teamId, { gameId: gameId }], getStatus);
 
   useEffect(() => {
     if (data && data.response.Count > 0) {
       const gameData = data.response.Items[0];
+      console.log(gameData);
       setPlayerData({
         teamName: gameData.teamName,
         gameTime: new Date(gameData.dateTime).toLocaleString('en-US'),

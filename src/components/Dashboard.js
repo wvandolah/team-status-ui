@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router-dom';
 import Header from './Header';
 import SideBar from './SideBar';
@@ -8,6 +8,8 @@ import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import SendStatus from './SendStatus';
 import CheckStatus from './CheckStatus';
+import { useAuth0 } from '../react-auth0-spa';
+import { authAxios } from '../utils/service';
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -24,8 +26,16 @@ const useStyles = makeStyles((theme) => {
   };
 });
 const Dashboard = ({ match }) => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const classes = useStyles();
+  const { getTokenSilently } = useAuth0();
+  useEffect(() => {
+    const setToken = async () => {
+      const token = await getTokenSilently();
+      authAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    };
+    setToken();
+  }, [getTokenSilently]);
   const handleDrawerOpen = () => {
     setOpen(true);
   };

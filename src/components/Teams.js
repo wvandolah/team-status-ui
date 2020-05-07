@@ -3,7 +3,7 @@ import Team from './Team';
 
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import { v4 as uuid } from 'uuid';
+import shortid from 'shortid';
 import { useQuery } from 'react-query';
 import { useAuth0 } from '../react-auth0-spa';
 import { getTeams } from '../utils/service';
@@ -21,7 +21,7 @@ const Teams = (props) => {
   const { status, data, error } = useQuery(userSub, getTeams);
 
   const addTeam = () => {
-    setTeams([...teams, { ...newTeam, teamId: uuid(), userId: userSub }]);
+    setTeams([...teams, { ...newTeam, teamId: shortid.generate(), userId: userSub }]);
   };
   const removeEditTemp = (teamId) => {
     const savedEditRemoved = teams.filter((team) => team.teamId !== teamId);

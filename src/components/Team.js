@@ -9,7 +9,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Player from './Player';
 import { postTeam } from '../utils/service';
 import { makeStyles } from '@material-ui/core';
-import { v4 as uuid } from 'uuid';
+import shortid from 'shortid';
 import { useMutation, queryCache } from 'react-query';
 
 const newPlayer = {
@@ -97,7 +97,7 @@ const Team = ({ team, removeEditTemp, history }) => {
 
   const addPlayer = () => {
     setEditingPlayer(true);
-    setPlayers([...players, { ...newPlayer, id: uuid() }]);
+    setPlayers([...players, { ...newPlayer, id: shortid.generate() }]);
   };
 
   const removePlayer = (id) => {
@@ -136,7 +136,7 @@ const Team = ({ team, removeEditTemp, history }) => {
     <ExpansionPanel expanded={expanded} onChange={() => setExpanded(!expanded)}>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1bh-content" id="panel1bh-header">
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
+          <Grid item sm={12} md={6}>
             <TextField
               required
               error={saveError.length > 0}
@@ -152,7 +152,7 @@ const Team = ({ team, removeEditTemp, history }) => {
               helperText={saveError}
             />
           </Grid>
-          <Grid item xs={6} sm={2}>
+          <Grid item xs={6} sm={3} md={2}>
             <Button
               variant="outlined"
               color="primary"
@@ -163,7 +163,7 @@ const Team = ({ team, removeEditTemp, history }) => {
               {!editName ? 'Edit' : 'Save'}
             </Button>
           </Grid>
-          <Grid item xs={6} sm={2}>
+          <Grid item xs={6} sm={3} md={2}>
             <Button
               variant="contained"
               color="secondary"
@@ -177,7 +177,7 @@ const Team = ({ team, removeEditTemp, history }) => {
               Send
             </Button>
           </Grid>
-          <Grid item xs={6} sm={2}>
+          <Grid item xs={6} sm={3} md={2}>
             <Button
               variant="contained"
               color="primary"
@@ -196,7 +196,7 @@ const Team = ({ team, removeEditTemp, history }) => {
       </ExpansionPanelSummary>
       <Grid container spacing={3} className={classes.grid}>
         {players.map((player) => (
-          <Grid key={player.id} item xs={12} sm={6}>
+          <Grid key={player.id} item sm={12} md={6}>
             <Paper className={classes.paper} elevation={3}>
               <Player person={player} removePlayer={removePlayer} updatePlayer={updatePlayer} edit={editName} />
             </Paper>

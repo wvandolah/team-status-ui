@@ -52,7 +52,7 @@ const CheckStatus = ({ location, history }) => {
   return (
     <Grid container spacing={3}>
       {data.response.Items.map((game) => (
-        <Grid key={game.gameId} item lg={12} xl={6}>
+        <Grid key={game.gameId} item xs={12} xl={6}>
           <Paper className={classes.paper} elevation={1}>
             <Typography variant="subtitle1" gutterBottom>
               {new Date(game.dateTime).toLocaleString('en-US')}
