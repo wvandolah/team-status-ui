@@ -17,7 +17,7 @@ const Teams = (props) => {
   const { user, loading } = useAuth0();
   const [teams, setTeams] = useState([]);
 
-  const userSub = loading ? '' : user.sub;
+  const userSub = loading ? '' : user.subSplit;
   const { status, data, error } = useQuery(userSub, getTeams);
 
   const addTeam = () => {
