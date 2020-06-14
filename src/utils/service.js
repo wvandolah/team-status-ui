@@ -39,6 +39,6 @@ export const postUpdateStatus = async (body) => {
 
 export const deleteStatuses = async (body) => {
   console.log(body);
-  const data = await axios.delete(`${url}status`, { data: body });
+  const data = await authAxios.delete(`${url}status`, { data: body });
   return data;
 };
