@@ -182,7 +182,6 @@ const Team = ({ team, removeEditTemp, history }) => {
               variant="contained"
               color="primary"
               onClick={(event) => {
-                console.log(event, 'here');
                 history.push('/home/status', team.teamId);
                 event.stopPropagation();
               }}

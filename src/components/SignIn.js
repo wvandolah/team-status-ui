@@ -14,8 +14,8 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="http://localhost:3000/">
-        TODO figure out website
+      <Link color="inherit" href="https://teamstatus.wvandolah.com/">
+        https://teamstatus.wvandolah.com/
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignInSide(props) {
   const classes = useStyles();
-  const { loginWithRedirect, isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0();
   useEffect(() => {
     const isAuth = () => {
       if (isAuthenticated) {
@@ -75,15 +75,7 @@ export default function SignInSide(props) {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form
-            className={classes.form}
-            onSubmit={() =>
-              loginWithRedirect({
-                appState: { targetUrl: '/home' },
-              })
-            }
-            noValidate
-          >
+          <form className={classes.form} onSubmit={() => props.history.push('/home')} noValidate>
             <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
               Sign In
             </Button>

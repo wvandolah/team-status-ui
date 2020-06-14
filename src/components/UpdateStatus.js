@@ -39,12 +39,12 @@ const UpdateStatus = () => {
   useEffect(() => {
     if (data && data.response.Count > 0) {
       const gameData = data.response.Items[0];
-      console.log(gameData);
       setPlayerData({
         teamName: gameData.teamName,
         gameTime: new Date(gameData.dateTime).toLocaleString('en-US'),
         playerName: `${gameData.players[playerId].firstName} ${gameData.players[playerId].lastName}`,
         currentStatus: gameData.players[playerId].status,
+        opponentName: gameData.opponentName,
       });
     }
   }, [data, playerId]);
@@ -70,6 +70,40 @@ const UpdateStatus = () => {
       }
     }
   };
+
+  const validGameUpdate = () =>
+    submitted ? (
+      <div>Response Submitted, revisit link to update status</div>
+    ) : (
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <Typography variant="subtitle1">
+            Will {playerData.playerName} be playing with team {playerData.teamName} on {playerData.gameTime}
+            {playerData.opponentName ? ` vs ${playerData.opponentName}` : ''}?
+          </Typography>
+        </Grid>
+        {playerData.currentStatus === 'Out' || playerData.currentStatus === 'In' ? (
+          <Grid item xs={12}>
+            <Typography variant="subtitle1">Current Response: {playerData.currentStatus}</Typography>
+          </Grid>
+        ) : (
+          <></>
+        )}
+
+        <Grid item xs={3}>
+          <Button variant="contained" color="primary" onClick={() => handleClick('In')}>
+            in
+          </Button>
+        </Grid>
+        <Grid item xs={2}>
+          <Button variant="contained" color="secondary" onClick={() => handleClick('Out')}>
+            out
+          </Button>
+        </Grid>
+      </Grid>
+    );
+
+  const invalidGameUPdate = () => <div>This Game has been canceled or rescheduled </div>;
   if (status === 'loading') {
     return <div>loading</div>;
   } else if (status === 'error') {
@@ -82,35 +116,7 @@ const UpdateStatus = () => {
       <Header noMenu />
       <main className={classes.container}>
         <Container maxWidth="sm" className={classes.container}>
-          {submitted ? (
-            <div>Response Submitted, revisit link to update status</div>
-          ) : (
-            <Grid container spacing={1}>
-              <Grid item xs={12}>
-                <Typography variant="subtitle1">
-                  Will {playerData.playerName} be playing with team {playerData.teamName} at {playerData.gameTime}?
-                </Typography>
-              </Grid>
-              {playerData.currentStatus === 'Out' || playerData.currentStatus === 'In' ? (
-                <Grid item xs={12}>
-                  <Typography variant="subtitle1">Current Response: {playerData.currentStatus}</Typography>
-                </Grid>
-              ) : (
-                <></>
-              )}
-
-              <Grid item xs={3}>
-                <Button variant="contained" color="primary" onClick={() => handleClick('In')}>
-                  in
-                </Button>
-              </Grid>
-              <Grid item xs={2}>
-                <Button variant="contained" color="secondary" onClick={() => handleClick('Out')}>
-                  out
-                </Button>
-              </Grid>
-            </Grid>
-          )}
+          {data.response.Count > 0 ? validGameUpdate() : invalidGameUPdate()}
         </Container>
       </main>
     </>

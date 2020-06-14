@@ -36,3 +36,9 @@ export const postUpdateStatus = async (body) => {
   const data = await axios.put(`${url}playerStatus`, body);
   return data;
 };
+
+export const deleteStatuses = async (body) => {
+  console.log(body);
+  const data = await axios.delete(`${url}status`, { data: body });
+  return data;
+};

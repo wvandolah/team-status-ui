@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -8,8 +8,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import { getStatuses } from '../utils/service';
-import { useQuery } from 'react-query';
+import Button from '@material-ui/core/Button';
+import { getStatuses, deleteStatuses } from '../utils/service';
+import { useQuery, useMutation, queryCache } from 'react-query';
 import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme) => ({
@@ -21,12 +22,26 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
   },
+  button: {
+    paddingTop: theme.spacing(2),
+  },
 }));
 
 const CheckStatus = ({ location, history }) => {
   const { status, data, error } = useQuery(location.state, getStatuses);
   const classes = useStyles();
+  const [deleteError, setDeleteError] = useState('');
 
+  const [mutate] = useMutation(deleteStatuses, {
+    onError: (error) => {
+      console.log(error.response);
+      setDeleteError(error.response.statusText);
+    },
+    onSuccess: () => {
+      queryCache.refetchQueries(location.state);
+    },
+  });
+  console.log(location.state);
   useEffect(() => {
     if (data) {
       data.response.Items.sort((a, b) => {
@@ -34,10 +49,16 @@ const CheckStatus = ({ location, history }) => {
         const timeB = new Date(b.dateTime);
         return timeB - timeA;
       });
-      console.log(data.response.Items);
     }
   }, [data]);
-  console.log(data, status);
+
+  const handleDelete = (gameId) => {
+    const deleteBody = {
+      teamId: location.state,
+      gameId: gameId,
+    };
+    mutate(deleteBody);
+  };
 
   if (status === 'loading') {
     return <div>loading</div>;
@@ -51,12 +72,17 @@ const CheckStatus = ({ location, history }) => {
   }
   return (
     <Grid container spacing={3}>
+      {deleteError !== '' ? <div> {deleteError} </div> : <></>}
       {data.response.Items.map((game) => (
         <Grid key={game.gameId} item xs={12} xl={6}>
           <Paper className={classes.paper} elevation={1}>
             <Typography variant="subtitle1" gutterBottom>
-              {new Date(game.dateTime).toLocaleString('en-US')}
+              Game Time: {game.dateTime}
             </Typography>
+            <Typography variant="subtitle2" gutterBottom>
+              Opponent: {game.opponentName}
+            </Typography>
+
             <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="simple table">
                 <TableHead>
@@ -82,6 +108,16 @@ const CheckStatus = ({ location, history }) => {
                 </TableBody>
               </Table>
             </TableContainer>
+            <Grid item xs={3} className={classes.button}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => handleDelete(game.gameId)}
+                name={game.gameId}
+              >
+                Delete
+              </Button>
+            </Grid>
           </Paper>
         </Grid>
       ))}

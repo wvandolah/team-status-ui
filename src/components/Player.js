@@ -44,7 +44,6 @@ const Player = ({ person, removePlayer, updatePlayer, edit, handleChecked, isSen
 
   useEffect(() => {
     if (person.firstName === '' && person.firstName.length < 1) {
-      console.log(person.firstName.length < 1);
       setIsEdit(true);
     }
     setPlayer(person);
@@ -69,7 +68,6 @@ const Player = ({ person, removePlayer, updatePlayer, edit, handleChecked, isSen
       };
     }
     setRequiredMet(errors);
-    console.log(errors);
   };
 
   const handleCancel = () => {

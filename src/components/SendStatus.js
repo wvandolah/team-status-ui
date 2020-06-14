@@ -4,6 +4,9 @@ import { useAuth0 } from '../react-auth0-spa';
 import Player from './Player';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { DateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
@@ -19,6 +22,10 @@ const useStyles = makeStyles((theme) => ({
   grid: {
     padding: theme.spacing(2),
   },
+  checkBox: {
+    paddingTop: theme.spacing(2),
+    color: theme.palette.warning.dark,
+  },
 }));
 const SendStatus = ({ location, history }) => {
   const teamId = location.state ? location.state.teamId : '';
@@ -26,13 +33,17 @@ const SendStatus = ({ location, history }) => {
   const { status, data, error } = useQuery([teamId, { userId: userId }], getTeam);
   const [check, setCheck] = useState({});
   const [hasSent, setHasSent] = useState(false);
+  const [opponentName, setOpponentName] = useState('');
+  const [sendAllChecked, setSendAllChecked] = useState(false);
   const [selectedDate, handleDateChange] = useState(new Date());
   const { loading } = useAuth0();
   const classes = useStyles();
   const handleChecked = (event) => {
+    if (sendAllChecked) {
+      setSendAllChecked(!sendAllChecked);
+    }
     setCheck({ ...check, [event.target.name]: event.target.checked });
   };
-
   const handleSend = async () => {
     try {
       const teamData = data.response.Items[0];
@@ -40,17 +51,28 @@ const SendStatus = ({ location, history }) => {
       const sendData = {
         teamId: teamData.teamId,
         teamName: teamData.teamName,
-        dateTime: selectedDate,
+        opponentName: opponentName,
+        dateTime: selectedDate.toLocaleString('en-US'),
         players: sendPlayers,
       };
       const returned = await postNotifications(sendData);
-      console.log(returned);
       if (returned.status === 201) {
         setHasSent(true);
       }
     } catch (e) {
-      console.log(e.response);
+      console.error(e.response);
     }
+  };
+
+  const handleOpponentName = (e) => {
+    setOpponentName(e.target.value);
+  };
+
+  const handleAllChecked = () => {
+    const tempCheck = { ...check };
+    data.response.Items[0].players.forEach((player) => (tempCheck[player.id] = !sendAllChecked));
+    setCheck(tempCheck);
+    setSendAllChecked(!sendAllChecked);
   };
 
   if (teamId === '') {
@@ -78,6 +100,28 @@ const SendStatus = ({ location, history }) => {
             onChange={handleDateChange}
           />
         </MuiPickersUtilsProvider>
+      </Grid>
+      <Grid item xs={12}>
+        <Grid item xs={6}>
+          <TextField
+            required
+            name="opponentName"
+            label="Opponent Name"
+            value={opponentName}
+            onChange={handleOpponentName}
+            onClick={(event) => event.stopPropagation()}
+            onFocus={(event) => event.stopPropagation()}
+            fullWidth
+            InputProps={{ classes: { disabled: classes.disabledInput } }}
+          />
+        </Grid>
+        <Grid>
+          <FormControlLabel
+            control={<Checkbox checked={sendAllChecked} onChange={handleAllChecked} />}
+            label="Check All"
+            className={classes.checkBox}
+          />
+        </Grid>
       </Grid>
 
       {data.response.Items[0].players.map((player) => (
