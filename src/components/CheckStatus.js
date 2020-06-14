@@ -67,7 +67,7 @@ const CheckStatus = ({ location, history }) => {
   } else if (data && data.response.Count < 1) {
     setTimeout(() => {
       history.push('/home');
-    }, 500);
+    }, 2000);
     return <div>No status updates have been sent</div>;
   }
   return (
@@ -117,6 +117,9 @@ const CheckStatus = ({ location, history }) => {
               >
                 Delete
               </Button>
+            </Grid>
+            <Grid item xs={12} className={classes.button}>
+              <Typography variant="subtitle2">Will notify players if game is in future</Typography>
             </Grid>
           </Paper>
         </Grid>
