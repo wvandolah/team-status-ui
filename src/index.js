@@ -4,6 +4,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { Auth0Provider } from './react-auth0-spa';
 import history from './utils/history';
+import { SnackbarProvider } from 'notistack';
 
 // A function that routes the user to the right place
 // after login
@@ -19,7 +20,9 @@ ReactDOM.render(
     audience={process.env.REACT_APP_AUTH0_audience}
     onRedirectCallback={onRedirectCallback}
   >
-    <App />
+    <SnackbarProvider maxSnack={3}>
+      <App />
+    </SnackbarProvider>
   </Auth0Provider>,
   document.getElementById('root'),
 );

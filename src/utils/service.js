@@ -22,8 +22,8 @@ export const postNotifications = (teamData) => {
   return authAxios.post(`${url}status`, teamData);
 };
 
-export const getStatus = async (teamId, { gameId }) => {
-  const { data } = await authAxios.get(`${url}status?teamId=${teamId}&gameId=${gameId}`);
+export const getStatus = async (teamId, { gameId, playerId }) => {
+  const { data } = await axios.get(`${url}playerStatus`);
   return data;
 };
 
@@ -38,7 +38,11 @@ export const postUpdateStatus = async (body) => {
 };
 
 export const deleteStatuses = async (body) => {
-  console.log(body);
   const data = await authAxios.delete(`${url}status`, { data: body });
+  return data;
+};
+
+export const resendNotifications = async (player) => {
+  const data = await authAxios.post(`${url}resend`, player);
   return data;
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { useAuth0 } from '../react-auth0-spa';
 import Player from './Player';
@@ -31,6 +31,7 @@ const SendStatus = ({ location, history }) => {
   const teamId = location.state ? location.state.teamId : '';
   const userId = location.state ? location.state.userId : '';
   const { status, data, error } = useQuery([teamId, { userId: userId }], getTeam);
+  const [players, setPlayers] = useState([]);
   const [check, setCheck] = useState({});
   const [hasSent, setHasSent] = useState(false);
   const [opponentName, setOpponentName] = useState('');
@@ -47,7 +48,7 @@ const SendStatus = ({ location, history }) => {
   const handleSend = async () => {
     try {
       const teamData = data.response.Items[0];
-      const sendPlayers = teamData.players.filter((player) => check[player.id]);
+      const sendPlayers = players.filter((player) => check[player.id]);
       const sendData = {
         teamId: teamData.teamId,
         teamName: teamData.teamName,
@@ -64,6 +65,11 @@ const SendStatus = ({ location, history }) => {
     }
   };
 
+  const updatePlayer = (updatedPlayer) => {
+    const withUpdated = players.map((player) => (player.id === updatedPlayer.id ? updatedPlayer : player));
+    setPlayers(withUpdated);
+  };
+
   const handleOpponentName = (e) => {
     setOpponentName(e.target.value);
   };
@@ -74,6 +80,12 @@ const SendStatus = ({ location, history }) => {
     setCheck(tempCheck);
     setSendAllChecked(!sendAllChecked);
   };
+
+  useEffect(() => {
+    if (data && data.response.Items[0]) {
+      setPlayers(data.response.Items[0].players);
+    }
+  }, [data]);
 
   if (teamId === '') {
     history.push('/home');
@@ -124,11 +136,12 @@ const SendStatus = ({ location, history }) => {
         </Grid>
       </Grid>
 
-      {data.response.Items[0].players.map((player) => (
+      {players.map((player) => (
         <Grid key={player.id} item xs={12} sm={6}>
           <Paper className={classes.paper} elevation={3}>
             <Player
               person={player}
+              updatePlayer={updatePlayer}
               isSendStatus
               handleChecked={handleChecked}
               isChecked={check[player.id] ? true : false}

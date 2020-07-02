@@ -182,7 +182,7 @@ const Team = ({ team, removeEditTemp, history }) => {
               variant="contained"
               color="primary"
               onClick={(event) => {
-                history.push('/home/status', team.teamId);
+                history.push('/home/status', { teamId: team.teamId, teamName: teamName });
                 event.stopPropagation();
               }}
               onFocus={(event) => event.stopPropagation()}

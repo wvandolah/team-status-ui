@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import Switch from '@material-ui/core/Switch';
 import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -50,7 +51,15 @@ const Player = ({ person, removePlayer, updatePlayer, edit, handleChecked, isSen
   }, [person]);
 
   const handleChange = (e) => {
-    setPlayer({ ...player, [e.target.name]: e.target.value });
+    const targetName = e.target.name;
+    let targetValue = e.target.value;
+    if (e.target.type === 'checkbox') {
+      targetValue = e.target.checked;
+      if (isSendStatus) {
+        updatePlayer({ ...player, [targetName]: targetValue });
+      }
+    }
+    setPlayer({ ...player, [targetName]: targetValue });
   };
 
   const handleUpdatePlayer = () => {
@@ -158,6 +167,34 @@ const Player = ({ person, removePlayer, updatePlayer, edit, handleChecked, isSen
             fullWidth
             disabled={!isEdit}
             InputProps={{ classes: { disabled: classes.disabledInput } }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={player.sendEmail ? player.sendEmail : false}
+                onChange={handleChange}
+                color="primary"
+                name="sendEmail"
+                disabled={isSendStatus ? false : !isEdit}
+              />
+            }
+            label="Send Email"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={player.sendText ? player.sendText : false}
+                onChange={handleChange}
+                color="primary"
+                name="sendText"
+                disabled={isSendStatus ? false : !isEdit}
+              />
+            }
+            label="Send Text"
           />
         </Grid>
         {isEdit ? (

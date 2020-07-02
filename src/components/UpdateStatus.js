@@ -34,7 +34,7 @@ const UpdateStatus = () => {
   const teamId = query.get('t');
   const playerId = query.get('p');
   const gameId = query.get('g');
-  const { status, data, error } = useQuery([teamId, { gameId: gameId }], getStatus);
+  const { status, data, error } = useQuery([teamId, { gameId: gameId, playerId: playerId }], getStatus);
 
   useEffect(() => {
     if (data && data.response.Count > 0) {

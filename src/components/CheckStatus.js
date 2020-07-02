@@ -9,9 +9,12 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import { getStatuses, deleteStatuses } from '../utils/service';
+import IconButton from '@material-ui/core/IconButton';
+import SendIcon from '@material-ui/icons/Send';
+import { getStatuses, deleteStatuses, resendNotifications } from '../utils/service';
 import { useQuery, useMutation, queryCache } from 'react-query';
 import Typography from '@material-ui/core/Typography';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -28,20 +31,34 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CheckStatus = ({ location, history }) => {
-  const { status, data, error } = useQuery(location.state, getStatuses);
+  const { status, data, error } = useQuery(location.state.teamId, getStatuses);
   const classes = useStyles();
   const [deleteError, setDeleteError] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [mutate] = useMutation(deleteStatuses, {
+  const [deleteMutate] = useMutation(deleteStatuses, {
     onError: (error) => {
-      console.log(error.response);
+      console.error(error.response);
       setDeleteError(error.response.statusText);
     },
     onSuccess: () => {
-      queryCache.refetchQueries(location.state);
+      queryCache.refetchQueries(location.state.teamId);
     },
   });
-  console.log(location.state);
+
+  const [resendMutate] = useMutation(resendNotifications, {
+    onError: (error) => {
+      let returnMsg = error.message
+        ? `Resend failed: ${error.message}`
+        : 'Something unexpected happened while resending';
+      enqueueSnackbar(returnMsg, { variant: 'error' });
+    },
+    onSuccess: (data) => {
+      enqueueSnackbar(`Resent successfully`, {
+        variant: 'success',
+      });
+    },
+  });
   useEffect(() => {
     if (data) {
       data.response.Items.sort((a, b) => {
@@ -54,10 +71,21 @@ const CheckStatus = ({ location, history }) => {
 
   const handleDelete = (gameId) => {
     const deleteBody = {
-      teamId: location.state,
+      teamId: location.state.teamId,
       gameId: gameId,
     };
-    mutate(deleteBody);
+    deleteMutate(deleteBody);
+  };
+
+  const resend = (player, gameId, dateTime) => {
+    const resendBody = {
+      teamId: location.state.teamId,
+      teamName: location.state.teamName,
+      gameId: gameId,
+      dateTime: dateTime,
+      players: [player],
+    };
+    resendMutate(resendBody);
   };
 
   if (status === 'loading') {
@@ -91,6 +119,7 @@ const CheckStatus = ({ location, history }) => {
                     <TableCell align="right">Last Name</TableCell>
                     <TableCell align="right">Status</TableCell>
                     <TableCell align="right">Type</TableCell>
+                    <TableCell align="right">Resend</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -103,6 +132,11 @@ const CheckStatus = ({ location, history }) => {
                         <TableCell align="right">{row.lastName}</TableCell>
                         <TableCell align="right">{row.status ? row.status : 'No Response'}</TableCell>
                         <TableCell align="right">{row.type}</TableCell>
+                        <TableCell align="right">
+                          <IconButton onClick={() => resend(row, game.gameId, game.dateTime)}>
+                            <SendIcon color="primary" />
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     ))}
                 </TableBody>
@@ -119,7 +153,7 @@ const CheckStatus = ({ location, history }) => {
               </Button>
             </Grid>
             <Grid item xs={12} className={classes.button}>
-              <Typography variant="subtitle2">Will notify players if game is in future</Typography>
+              <Typography variant="subtitle2">Delete will notify players if game is in future</Typography>
             </Grid>
           </Paper>
         </Grid>
