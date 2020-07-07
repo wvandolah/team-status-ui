@@ -12,6 +12,7 @@ import Button from '@material-ui/core/Button';
 import { DateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { getTeam, postNotifications } from '../utils/service';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -33,12 +34,12 @@ const SendStatus = ({ location, history }) => {
   const { status, data, error } = useQuery([teamId, { userId: userId }], getTeam);
   const [players, setPlayers] = useState([]);
   const [check, setCheck] = useState({});
-  const [hasSent, setHasSent] = useState(false);
   const [opponentName, setOpponentName] = useState('');
   const [sendAllChecked, setSendAllChecked] = useState(false);
   const [selectedDate, handleDateChange] = useState(new Date());
   const { loading } = useAuth0();
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
   const handleChecked = (event) => {
     if (sendAllChecked) {
       setSendAllChecked(!sendAllChecked);
@@ -58,10 +59,16 @@ const SendStatus = ({ location, history }) => {
       };
       const returned = await postNotifications(sendData);
       if (returned.status === 201) {
-        setHasSent(true);
+        enqueueSnackbar(`Successfully Submitted`, {
+          variant: 'success',
+        });
+        history.push('/home');
+      } else {
+        enqueueSnackbar(`Something went wrong`, { variant: 'error' });
       }
     } catch (e) {
-      console.error(e.response);
+      enqueueSnackbar(`${e.response.status}: ${e.response.statusText}`, { variant: 'error' });
+      console.error(e.response.status);
     }
   };
 
@@ -99,9 +106,7 @@ const SendStatus = ({ location, history }) => {
     return <div></div>;
   }
 
-  return hasSent ? (
-    <div>sent</div>
-  ) : (
+  return (
     <Grid container spacing={3} className={classes.grid}>
       <Grid item xs={12}>
         <MuiPickersUtilsProvider utils={DateFnsUtils}>

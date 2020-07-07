@@ -11,6 +11,7 @@ import { postTeam } from '../utils/service';
 import { makeStyles } from '@material-ui/core';
 import shortid from 'shortid';
 import { useMutation, queryCache } from 'react-query';
+import { useSnackbar } from 'notistack';
 
 const newPlayer = {
   firstName: '',
@@ -43,6 +44,7 @@ const Team = ({ team, removeEditTemp, history }) => {
   const [editName, setEditName] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
   const classes = useStyles();
   const [mutate] = useMutation(postTeam, {
     onMutate: (newTeam) => {
@@ -65,12 +67,16 @@ const Team = ({ team, removeEditTemp, history }) => {
       return () => queryCache.setQueryData(team.userId, previousTeams);
     },
     onError: (err, newTeam, rollback) => {
+      enqueueSnackbar(`Something went wrong`, { variant: 'error' });
       return rollback();
     },
     onSettled: () => {
-      queryCache.refetchQueries(team.userId);
+      queryCache.invalidateQueries(team.userId);
     },
     onSuccess: () => {
+      enqueueSnackbar(`Successfully Submitted`, {
+        variant: 'success',
+      });
       setPlayersUpdated(false);
       setEditName(false);
       removeEditTemp(team.teamId);

@@ -217,7 +217,7 @@ const Player = ({ person, removePlayer, updatePlayer, edit, handleChecked, isSen
                 <Grid item xs={12}>
                   <FormControlLabel
                     control={<Checkbox checked={isChecked} onChange={handleChecked} name={player.id} />}
-                    label="Send to Phone"
+                    label="Include Player"
                     className={classes.checkBox}
                   />
                 </Grid>

@@ -42,7 +42,7 @@ const CheckStatus = ({ location, history }) => {
       setDeleteError(error.response.statusText);
     },
     onSuccess: () => {
-      queryCache.refetchQueries(location.state.teamId);
+      queryCache.invalidateQueries(location.state.teamId);
     },
   });
 
@@ -93,9 +93,6 @@ const CheckStatus = ({ location, history }) => {
   } else if (status === 'error') {
     return <div>{error.message}</div>;
   } else if (data && data.response.Count < 1) {
-    setTimeout(() => {
-      history.push('/home');
-    }, 2000);
     return <div>No status updates have been sent</div>;
   }
   return (
@@ -142,6 +139,14 @@ const CheckStatus = ({ location, history }) => {
                 </TableBody>
               </Table>
             </TableContainer>
+            {Object.keys(game.attendance).map((att) => (
+              <Grid xs={12}>
+                <Typography variant="subtitle2" gutterBottom>
+                  {att}: {game.attendance[att]}
+                </Typography>
+              </Grid>
+            ))}
+
             <Grid item xs={3} className={classes.button}>
               <Button
                 variant="contained"
