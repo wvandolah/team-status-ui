@@ -139,13 +139,14 @@ const CheckStatus = ({ location, history }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-            {Object.keys(game.attendance).map((att) => (
-              <Grid xs={12}>
-                <Typography variant="subtitle2" gutterBottom>
-                  {att}: {game.attendance[att]}
-                </Typography>
-              </Grid>
-            ))}
+            {game.attendance &&
+              Object.keys(game.attendance).map((att) => (
+                <Grid xs={12}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    {att}: {game.attendance[att]}
+                  </Typography>
+                </Grid>
+              ))}
 
             <Grid item xs={3} className={classes.button}>
               <Button
