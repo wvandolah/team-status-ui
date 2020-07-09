@@ -83,7 +83,7 @@ const UpdateStatus = () => {
       playerId,
       teamId,
       gameId,
-      clickedStatus,
+      status: clickedStatus,
     };
     try {
       mutate(request);
