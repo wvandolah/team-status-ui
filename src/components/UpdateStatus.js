@@ -78,12 +78,12 @@ const UpdateStatus = () => {
     }
   }, [data, playerId]);
 
-  const handleClick = async (status) => {
+  const handleClick = async (clickedStatus) => {
     const request = {
       playerId,
       teamId,
       gameId,
-      status,
+      clickedStatus,
     };
     try {
       mutate(request);

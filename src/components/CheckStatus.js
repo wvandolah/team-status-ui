@@ -37,9 +37,9 @@ const CheckStatus = ({ location, history }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [deleteMutate] = useMutation(deleteStatuses, {
-    onError: (error) => {
-      console.error(error.response);
-      setDeleteError(error.response.statusText);
+    onError: (err) => {
+      console.error(err.response);
+      setDeleteError(err.response.statusText);
     },
     onSuccess: () => {
       queryCache.invalidateQueries(location.state.teamId);
@@ -47,13 +47,11 @@ const CheckStatus = ({ location, history }) => {
   });
 
   const [resendMutate] = useMutation(resendNotifications, {
-    onError: (error) => {
-      let returnMsg = error.message
-        ? `Resend failed: ${error.message}`
-        : 'Something unexpected happened while resending';
+    onError: (err) => {
+      let returnMsg = err.message ? `Resend failed: ${err.message}` : 'Something unexpected happened while resending';
       enqueueSnackbar(returnMsg, { variant: 'error' });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       enqueueSnackbar(`Resent successfully`, {
         variant: 'success',
       });

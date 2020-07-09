@@ -52,12 +52,12 @@ const Team = ({ team, removeEditTemp, history }) => {
       removeEditTemp(team.teamId);
       let update = false;
       queryCache.setQueryData(team.userId, (old) => {
-        const cacheTeams = old.response.Items.map((team) => {
-          if (team.teamId === newTeam.teamId) {
+        const cacheTeams = old.response.Items.map((t) => {
+          if (t.teamId === newTeam.teamId) {
             update = true;
             return newTeam;
           } else {
-            return team;
+            return t;
           }
         });
         if (!update) cacheTeams.push(newTeam);
