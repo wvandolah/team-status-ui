@@ -23,7 +23,7 @@ export const postNotifications = (teamData) => {
 };
 
 export const getStatus = async (teamId, { gameId, playerId }) => {
-  const { data } = await authAxios.get(`${url}status?teamId=${teamId}&gameId=${gameId}&playerId=${playerId}`);
+  const { data } = await axios.get(`${url}status?teamId=${teamId}&gameId=${gameId}&playerId=${playerId}`);
   return data;
 };
 
