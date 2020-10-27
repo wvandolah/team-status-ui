@@ -89,13 +89,13 @@ const CheckStatus = ({ location, history }) => {
     resendMutate(resendBody);
   };
 
-  const smsDelivered = (delivered) => {
-    if (delivered === 'success') {
+  const smsDelivered = (delivered, status) => {
+    if (delivered === 'success' || status) {
       return <CheckCircleOutlineIcon color="primary" />;
     } else if (delivered === 'failed') {
       return <ThumbDownIcon color="secondary" />;
     } else {
-      return <HourglassEmptyIcon color="primary" />;
+      return <HourglassEmptyIcon color="secondary" />;
     }
   };
 
@@ -141,7 +141,7 @@ const CheckStatus = ({ location, history }) => {
                         <TableCell align="right">{row.lastName}</TableCell>
                         <TableCell align="right">{row.status ? row.status : 'No Response'}</TableCell>
                         <TableCell align="right">{row.type}</TableCell>
-                        <TableCell align="right">{smsDelivered(row.smsDelivered)}</TableCell>
+                        <TableCell align="right">{smsDelivered(row.smsDelivered, row.status)}</TableCell>
                         <TableCell align="right">
                           <IconButton onClick={() => resend(row, game.gameId, game.dateTime)}>
                             <SendIcon color="primary" />
