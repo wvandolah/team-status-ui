@@ -11,8 +11,8 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import { getStatuses, deleteStatuses, resendNotifications } from '../utils/service';
 import { useQuery, useMutation, queryCache } from 'react-query';
@@ -90,9 +90,9 @@ const CheckStatus = ({ location, history }) => {
   };
 
   const smsDelivered = (delivered, status) => {
-    if (delivered === 'success' || status) {
-      return <CheckCircleOutlineIcon color="primary" />;
-    } else if (delivered === 'failed') {
+    if (delivered === 'success' || delivered === 'In') {
+      return <ThumbUpIcon color="primary" />;
+    } else if (delivered === 'failed' || delivered === 'Out') {
       return <ThumbDownIcon color="secondary" />;
     } else {
       return <HourglassEmptyIcon color="secondary" />;
@@ -125,8 +125,8 @@ const CheckStatus = ({ location, history }) => {
                   <TableRow>
                     <TableCell>First Name</TableCell>
                     <TableCell align="right">Last Name</TableCell>
-                    <TableCell align="right">Status</TableCell>
                     <TableCell align="right">Type</TableCell>
+                    <TableCell align="right">Status</TableCell>
                     <TableCell align="right">Sms Delivered</TableCell>
                     <TableCell align="right">Resend</TableCell>
                   </TableRow>
@@ -139,8 +139,10 @@ const CheckStatus = ({ location, history }) => {
                           {row.firstName}
                         </TableCell>
                         <TableCell align="right">{row.lastName}</TableCell>
-                        <TableCell align="right">{row.status ? row.status : 'No Response'}</TableCell>
                         <TableCell align="right">{row.type}</TableCell>
+                        <TableCell align="right">
+                          {row.status ? smsDelivered(row.status, '') : smsDelivered('', '')}
+                        </TableCell>
                         <TableCell align="right">{smsDelivered(row.smsDelivered, row.status)}</TableCell>
                         <TableCell align="right">
                           <IconButton onClick={() => resend(row, game.gameId, game.dateTime)}>
