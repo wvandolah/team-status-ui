@@ -89,7 +89,11 @@ const CheckStatus = ({ location, history }) => {
     resendMutate(resendBody);
   };
 
-  const smsDelivered = (delivered, status) => {
+  const smsDelivered = (row, status) => {
+    if (!row.smsDelivered) {
+      return <>;
+    }
+    const delivered = row.smsDelivered;
     if (delivered === 'success' || delivered === 'In') {
       return <ThumbUpIcon color="primary" />;
     } else if (delivered === 'failed' || delivered === 'Out') {
@@ -143,7 +147,7 @@ const CheckStatus = ({ location, history }) => {
                         <TableCell align="right">
                           {row.status ? smsDelivered(row.status, '') : smsDelivered('', '')}
                         </TableCell>
-                        <TableCell align="right">{smsDelivered(row.smsDelivered, row.status)}</TableCell>
+                        <TableCell align="right">{smsDelivered(row, row.status)}</TableCell>
                         <TableCell align="right">
                           <IconButton onClick={() => resend(row, game.gameId, game.dateTime)}>
                             <SendIcon color="primary" />
