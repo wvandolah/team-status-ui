@@ -3,8 +3,8 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Player from './Player';
 import { postTeam } from '../utils/service';
@@ -139,8 +139,8 @@ const Team = ({ team, removeEditTemp, history }) => {
   };
 
   return (
-    <ExpansionPanel expanded={expanded} onChange={() => setExpanded(!expanded)}>
-      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1bh-content" id="panel1bh-header">
+    <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1bh-content" id="panel1bh-header">
         <Grid container spacing={3}>
           <Grid item sm={12} md={6}>
             <TextField
@@ -198,7 +198,7 @@ const Team = ({ team, removeEditTemp, history }) => {
             </Button>
           </Grid>
         </Grid>
-      </ExpansionPanelSummary>
+      </AccordionSummary>
       <Grid container spacing={3} className={classes.grid}>
         {players.map((player) => (
           <Grid key={player.id} item sm={12} md={6}>
@@ -213,7 +213,7 @@ const Team = ({ team, removeEditTemp, history }) => {
           </Button>
         </Grid>
       </Grid>
-    </ExpansionPanel>
+    </Accordion>
   );
 };
 

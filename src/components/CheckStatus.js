@@ -6,6 +6,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -34,17 +36,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CheckStatus = ({ location, history }) => {
-  const { status, data, error } = useQuery(location.state.teamId, getStatuses);
+  const { status, data, error } = useQuery(location.state.teamId, getStatuses, {
+    enabled: location.state.teamId !== '',
+  });
   const classes = useStyles();
   const [deleteError, setDeleteError] = useState('');
+  const [games, setGames] = useState([]);
+  const [showPast, setShowPast] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const [deleteMutate] = useMutation(deleteStatuses, {
     onError: (err) => {
-      console.error(err.response);
-      setDeleteError(err.response.statusText);
+      enqueueSnackbar(err.response, { variant: 'error' });
     },
     onSuccess: () => {
+      enqueueSnackbar(`Delete successfully`, {
+        variant: 'success',
+      });
       queryCache.invalidateQueries(location.state.teamId);
     },
   });
@@ -62,13 +70,20 @@ const CheckStatus = ({ location, history }) => {
   });
   useEffect(() => {
     if (data) {
-      data.response.Items.sort((a, b) => {
-        const timeA = new Date(a.dateTime);
-        const timeB = new Date(b.dateTime);
-        return timeB - timeA;
-      });
+      setGames(
+        data.response.Items.filter((game) => {
+          const timeA = new Date(game.dateTime);
+          const timeB = new Date();
+          timeB.setDate(timeB.getDate() - 1);
+          return showPast ? true : timeA >= timeB;
+        }).sort((a, b) => {
+          const timeA = new Date(a.dateTime);
+          const timeB = new Date(b.dateTime);
+          return timeA - timeB;
+        }),
+      );
     }
-  }, [data]);
+  }, [data, showPast]);
 
   const handleDelete = (gameId) => {
     const deleteBody = {
@@ -89,14 +104,14 @@ const CheckStatus = ({ location, history }) => {
     resendMutate(resendBody);
   };
 
-  const smsDelivered = (row, status) => {
-    if (!row.smsDelivered) {
-      return <>;
+  const smsDelivered = (row) => {
+    if (!('smsDelivered' in row)) {
+      return <></>;
     }
     const delivered = row.smsDelivered;
-    if (delivered === 'success' || delivered === 'In') {
+    if (delivered === 'success') {
       return <ThumbUpIcon color="primary" />;
-    } else if (delivered === 'failed' || delivered === 'Out') {
+    } else if (delivered === 'failed') {
       return <ThumbDownIcon color="secondary" />;
     } else {
       return <HourglassEmptyIcon color="secondary" />;
@@ -112,15 +127,25 @@ const CheckStatus = ({ location, history }) => {
   }
   return (
     <Grid container spacing={3}>
+      <Grid container item xs={12} justify="flex-end">
+        <Grid item>
+          <FormControlLabel
+            control={
+              <Switch checked={showPast} onChange={() => setShowPast(!showPast)} color="primary" name="pastGames" />
+            }
+            label="Show Past Games"
+          />
+        </Grid>
+      </Grid>
       {deleteError !== '' ? <div> {deleteError} </div> : <></>}
-      {data.response.Items.map((game) => (
+      {games.map((game, i) => (
         <Grid key={game.gameId} item xs={12} xl={6}>
           <Paper className={classes.paper} elevation={1}>
             <Typography variant="subtitle1" gutterBottom>
               Game Time: {game.dateTime}
             </Typography>
             <Typography variant="subtitle2" gutterBottom>
-              Opponent: {game.opponentName}
+              Opponent: {game.opponentName} index {i}
             </Typography>
 
             <TableContainer component={Paper}>
@@ -138,16 +163,14 @@ const CheckStatus = ({ location, history }) => {
                 <TableBody>
                   {game &&
                     Object.values(game.players).map((row) => (
-                      <TableRow key={row.lastName}>
+                      <TableRow key={row.id}>
                         <TableCell component="th" scope="row">
                           {row.firstName}
                         </TableCell>
                         <TableCell align="right">{row.lastName}</TableCell>
                         <TableCell align="right">{row.type}</TableCell>
-                        <TableCell align="right">
-                          {row.status ? smsDelivered(row.status, '') : smsDelivered('', '')}
-                        </TableCell>
-                        <TableCell align="right">{smsDelivered(row, row.status)}</TableCell>
+                        <TableCell align="right">{row.status ? row.status : 'No Response'}</TableCell>
+                        <TableCell align="right">{smsDelivered(row)}</TableCell>
                         <TableCell align="right">
                           <IconButton onClick={() => resend(row, game.gameId, game.dateTime)}>
                             <SendIcon color="primary" />
@@ -160,7 +183,7 @@ const CheckStatus = ({ location, history }) => {
             </TableContainer>
             {game.attendance &&
               Object.keys(game.attendance).map((att) => (
-                <Grid xs={12}>
+                <Grid key={att} item xs={12}>
                   <Typography variant="subtitle2" gutterBottom>
                     {att}: {game.attendance[att]}
                   </Typography>

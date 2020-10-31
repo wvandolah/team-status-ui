@@ -5,6 +5,7 @@ import SideBar from './SideBar';
 import Profile from './Profile';
 import Teams from './Teams';
 import Container from '@material-ui/core/Container';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 import SendStatus from './SendStatus';
 import CheckStatus from './CheckStatus';
@@ -29,7 +30,7 @@ const useStyles = makeStyles((theme) => {
 const Dashboard = ({ match }) => {
   const [open, setOpen] = useState(false);
   const classes = useStyles();
-  const { getTokenSilently } = useAuth0();
+  const { loading, getTokenSilently } = useAuth0();
   useEffect(() => {
     const setToken = async () => {
       const token = await getTokenSilently();
@@ -50,10 +51,16 @@ const Dashboard = ({ match }) => {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-          <Route path={`${match.path}`} component={Teams} exact />
-          <Route path={`${match.path}/profile`} component={Profile} />
-          <Route path={`${match.path}/send`} component={SendStatus} />
-          <Route path={`${match.path}/status`} component={CheckStatus} />
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <>
+              <Route path={`${match.path}`} component={Teams} exact />
+              <Route path={`${match.path}/profile`} component={Profile} />
+              <Route path={`${match.path}/send`} component={SendStatus} />
+              <Route path={`${match.path}/status`} component={CheckStatus} />
+            </>
+          )}
         </Container>
       </main>
     </>
