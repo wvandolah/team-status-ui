@@ -122,8 +122,8 @@ const CheckStatus = ({ location, history }) => {
     return <div>loading</div>;
   } else if (status === 'error') {
     return <div>{error.message}</div>;
-  } else if (data && data.response.Count < 1) {
-    return <div>No status updates have been sent</div>;
+  } else if (data && games.length < 1) {
+    return <div>No Game games scheduled</div>;
   }
   return (
     <Grid container spacing={3}>
@@ -137,7 +137,6 @@ const CheckStatus = ({ location, history }) => {
           />
         </Grid>
       </Grid>
-      {deleteError !== '' ? <div> {deleteError} </div> : <></>}
       {games.map((game, i) => (
         <Grid key={game.gameId} item xs={12} xl={6}>
           <Paper className={classes.paper} elevation={1}>
@@ -145,7 +144,7 @@ const CheckStatus = ({ location, history }) => {
               Game Time: {game.dateTime}
             </Typography>
             <Typography variant="subtitle2" gutterBottom>
-              Opponent: {game.opponentName} index {i}
+              Opponent: {game.opponentName}
             </Typography>
 
             <TableContainer component={Paper}>
