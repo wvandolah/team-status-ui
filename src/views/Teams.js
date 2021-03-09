@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Team from './Team';
+import Team from '../components/Team';
 
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';

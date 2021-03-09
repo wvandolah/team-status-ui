@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { useAuth0 } from '../react-auth0-spa';
-import Player from './Player';
+import Player from '../components/Player';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -46,6 +46,7 @@ const SendStatus = ({ location, history }) => {
     }
     setCheck({ ...check, [event.target.name]: event.target.checked });
   };
+
   const handleSend = async () => {
     try {
       const teamData = data.response.Items[0];
@@ -54,7 +55,8 @@ const SendStatus = ({ location, history }) => {
         teamId: teamData.teamId,
         teamName: teamData.teamName,
         opponentName: opponentName,
-        dateTime: selectedDate.toLocaleString('en-US'),
+        // TODO: handle timeZones better. Intl.DateTimeFormat().resolvedOptions().timeZone will return users tz string needed when using .toLocaleString('en-US', {timeZone: 'America/Chicago'})
+        dateTime: selectedDate.toISOString(),
         players: sendPlayers,
       };
       const returned = await postNotifications(sendData);

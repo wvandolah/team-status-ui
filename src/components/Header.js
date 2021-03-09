@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 const Header = ({ handleDrawerOpen, open, noMenu }) => {
   const classes = useStyles();
   return (
-    <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+    <AppBar position="fixed" className={clsx(classes.appBar, open && classes.appBarShift)}>
       <Toolbar className={classes.toolbar}>
         {!noMenu ? (
           <IconButton
@@ -59,11 +59,6 @@ const Header = ({ handleDrawerOpen, open, noMenu }) => {
         <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
           Team Status
         </Typography>
-        {/* <IconButton color="inherit">
-          <Badge badgeContent={4} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton> */}
       </Toolbar>
     </AppBar>
   );
