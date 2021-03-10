@@ -78,17 +78,6 @@ const UpdateStatus = () => {
     }
   };
 
-  const newValidResponse = () => (
-    <GameEvent
-      showPast={showPast}
-      setShowPast={setShowPast}
-      gameData={data.response.Items}
-      handleClick={handleClick}
-      playerData={playerData}
-    />
-  );
-
-  const invalidGameUpdate = () => <div>This Game has been canceled or rescheduled </div>;
   if (status === 'loading') {
     return <div>loading</div>;
   } else if (status === 'error') {
@@ -101,7 +90,16 @@ const UpdateStatus = () => {
       <Header noMenu />
       <main>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="md">{data.response.Count > 0 ? newValidResponse() : invalidGameUpdate()}</Container>
+        <Container maxWidth="lg">
+          {' '}
+          <GameEvent
+            showPast={showPast}
+            setShowPast={setShowPast}
+            gameData={data.response.Items}
+            handleClick={handleClick}
+            playerData={playerData}
+          />{' '}
+        </Container>
       </main>
     </>
   );

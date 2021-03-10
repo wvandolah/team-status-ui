@@ -105,8 +105,6 @@ const CheckStatus = ({ location, history }) => {
     return <div>loading</div>;
   } else if (status === 'error') {
     return <div>{error.message}</div>;
-  } else if (data && games.length < 1) {
-    return <div>No Game games scheduled</div>;
   }
   return (
     <GameEvent

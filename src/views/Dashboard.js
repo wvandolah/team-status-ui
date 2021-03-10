@@ -14,6 +14,9 @@ import { authAxios } from '../utils/service';
 
 const useStyles = makeStyles((theme) => {
   return {
+    content: {
+      flexGrow: 1,
+    },
     appBarSpacer: theme.mixins.toolbar,
     container: {
       paddingTop: theme.spacing(4),
@@ -43,9 +46,9 @@ const Dashboard = ({ match }) => {
     <>
       <Header handleDrawerOpen={handleDrawerOpen} open={open} />
       <SideBar handleDrawerClose={handleDrawerClose} open={open} />
-      <main>
+      <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
+        <Container maxWidth="xl" className={classes.container}>
           {loading ? (
             <CircularProgress />
           ) : (
