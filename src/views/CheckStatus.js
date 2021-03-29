@@ -34,7 +34,6 @@ const CheckStatus = ({ location, history }) => {
 
   const [deleteMutate] = useMutation(deleteStatuses, {
     onError: (err) => {
-      console.log(err.response);
       enqueueSnackbar(err.response, { variant: 'error' });
     },
     onSuccess: () => {
@@ -76,6 +75,10 @@ const CheckStatus = ({ location, history }) => {
     deleteMutate(deleteBody);
   };
 
+  const handleAddPlayer = (gameData) => {
+    history.push('/home/send', { ...gameData, addPlayer: true });
+  };
+
   const resend = (player, gameId, dateTime) => {
     const resendBody = {
       teamId: location.state.teamId,
@@ -114,6 +117,7 @@ const CheckStatus = ({ location, history }) => {
       smsDelivered={smsDelivered}
       resend={resend}
       handleDelete={handleDelete}
+      handleAddPlayer={handleAddPlayer}
     />
   );
 };

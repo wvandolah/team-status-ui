@@ -37,6 +37,7 @@ const GameEvent = ({
   handleDelete,
   handleClick,
   playerData,
+  handleAddPlayer,
 }) => {
   const classes = useStyles();
   const [games, setGames] = useState([]);
@@ -50,6 +51,8 @@ const GameEvent = ({
           return timeA - timeB;
         }),
       );
+    } else {
+      setGames([]);
     }
   }, [gameData]);
 
@@ -71,7 +74,7 @@ const GameEvent = ({
     <>
       <Grid container spacing={3}>
         <Grid container item xs={12} justify="flex-end">
-          {playerData && (
+          {playerData && playerData.playerName && (
             <Grid item xs={12}>
               <Typography variant="h4">
                 {playerData.playerName}'s availability for team {playerData.teamName}
@@ -190,8 +193,8 @@ const GameEvent = ({
                     </Grid>
                   )}
                   {handleDelete && (
-                    <Grid container item xs={12}>
-                      <Grid item xs={3} className={classes.button}>
+                    <Grid container spacing={2} item xs={12}>
+                      <Grid item className={classes.button}>
                         <Button
                           variant="contained"
                           color="secondary"
@@ -199,6 +202,11 @@ const GameEvent = ({
                           name={game.gameId}
                         >
                           Delete
+                        </Button>
+                      </Grid>
+                      <Grid item className={classes.button}>
+                        <Button variant="contained" onClick={() => handleAddPlayer(game)} name={game.gameId}>
+                          Add Player
                         </Button>
                       </Grid>
                       <Grid item xs={12} className={classes.button}>

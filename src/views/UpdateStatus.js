@@ -16,6 +16,9 @@ const useQueryParam = () => {
 const useStyles = makeStyles((theme) => {
   return {
     appBarSpacer: theme.mixins.toolbar,
+    content: {
+      flexGrow: 1,
+    },
   };
 });
 const UpdateStatus = () => {
@@ -44,7 +47,6 @@ const UpdateStatus = () => {
 
   useEffect(() => {
     if (data && data.response.Count > 0) {
-      console.log(data.response.Items);
       const gameData = data.response.Items[0];
       const player = gameData.players.filter((p) => p.id === playerId)[0];
       setPlayerData({
@@ -56,7 +58,6 @@ const UpdateStatus = () => {
   }, [data, playerId]);
 
   const handleClick = async (clickedStatus, clickedGame) => {
-    console.log(clickedGame);
     const preventReClick = clickedGame.players.reduce(
       (acc, cur) => (cur.id && cur.status === clickedStatus ? (acc = true) : acc),
       false,
@@ -88,17 +89,16 @@ const UpdateStatus = () => {
   return (
     <>
       <Header noMenu />
-      <main>
+      <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg">
-          {' '}
           <GameEvent
             showPast={showPast}
             setShowPast={setShowPast}
             gameData={data.response.Items}
             handleClick={handleClick}
             playerData={playerData}
-          />{' '}
+          />
         </Container>
       </main>
     </>
