@@ -16,9 +16,6 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
-  table: {
-    minWidth: 450,
-  },
   paper: {
     padding: theme.spacing(2),
     display: 'flex',
@@ -133,7 +130,7 @@ const GameEvent = ({
 
                   <Grid item xs={12}>
                     <TableContainer component={Paper}>
-                      <Table className={classes.table} aria-label="simple table">
+                      <Table aria-label="simple table">
                         <TableHead>
                           <TableRow>
                             <TableCell>First Name</TableCell>
