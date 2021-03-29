@@ -22,13 +22,13 @@ export const postNotifications = (teamData) => {
   return authAxios.post(`${url}status`, teamData);
 };
 
-export const getStatus = async (teamId, { gameId, playerId }) => {
-  const { data } = await axios.get(`${url}playerStatus?teamId=${teamId}&gameId=${gameId}&playerId=${playerId}`);
+export const getStatus = async (teamId, { playerId, historic }) => {
+  const { data } = await axios.get(`${url}playerStatus?teamId=${teamId}&playerId=${playerId}&historic=${historic}`);
   return data;
 };
 
-export const getStatuses = async (teamId) => {
-  const { data } = await authAxios.get(`${url}status?teamId=${teamId}`);
+export const getStatuses = async (teamId, { historic }) => {
+  const { data } = await authAxios.get(`${url}status?teamId=${teamId}&historic=${historic}`);
   return data;
 };
 

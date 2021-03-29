@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { useAuth0 } from '../react-auth0-spa';
-import Player from './Player';
+import Player from '../components/Player';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -29,15 +29,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const SendStatus = ({ location, history }) => {
+  const { user, loading } = useAuth0();
   const teamId = location.state ? location.state.teamId : '';
-  const userId = location.state ? location.state.userId : '';
+  const userId = user ? user.subSplit : '';
+  const gameId = location.state ? location.state.gameId : '';
+  const addPlayer = location.state ? location.state.addPlayer : false;
+
   const { status, data, error } = useQuery([teamId, { userId: userId }], getTeam);
   const [players, setPlayers] = useState([]);
   const [check, setCheck] = useState({});
   const [opponentName, setOpponentName] = useState('');
   const [sendAllChecked, setSendAllChecked] = useState(false);
-  const [selectedDate, handleDateChange] = useState(new Date());
-  const { loading } = useAuth0();
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const handleChecked = (event) => {
@@ -50,12 +54,16 @@ const SendStatus = ({ location, history }) => {
     try {
       const teamData = data.response.Items[0];
       const sendPlayers = players.filter((player) => check[player.id]);
+
       const sendData = {
         teamId: teamData.teamId,
         teamName: teamData.teamName,
         opponentName: opponentName,
-        dateTime: selectedDate.toLocaleString('en-US'),
+        // TODO: handle timeZones better. Intl.DateTimeFormat().resolvedOptions().timeZone will return users tz string needed when using .toLocaleString('en-US', {timeZone: 'America/Chicago'})
+        dateTime: selectedDate.toISOString(),
         players: sendPlayers,
+        addPlayer: addPlayer,
+        gameId: gameId,
       };
       const returned = await postNotifications(sendData);
       if (returned.status === 201) {
@@ -68,7 +76,6 @@ const SendStatus = ({ location, history }) => {
       }
     } catch (e) {
       enqueueSnackbar(`${e.response.status}: ${e.response.statusText}`, { variant: 'error' });
-      console.error(e.response.status);
     }
   };
 
@@ -90,9 +97,17 @@ const SendStatus = ({ location, history }) => {
 
   useEffect(() => {
     if (data && data.response.Items[0]) {
-      setPlayers(data.response.Items[0].players);
+      const receivedPlayers = data.response.Items[0].players;
+      if (addPlayer) {
+        const alreadyAdded = location.state.players.map((player) => player.id);
+        setPlayers(receivedPlayers.filter((player) => !alreadyAdded.includes(player.id)));
+        setSelectedDate(new Date(location.state.dateTime));
+        setOpponentName(location.state.opponentName ? location.state.opponentName : '');
+      } else {
+        setPlayers(receivedPlayers);
+      }
     }
-  }, [data]);
+  }, [data, addPlayer, location]);
 
   if (teamId === '') {
     history.push('/home');
@@ -114,10 +129,12 @@ const SendStatus = ({ location, history }) => {
             label="DateTimePicker"
             inputVariant="outlined"
             value={selectedDate}
-            onChange={handleDateChange}
+            onChange={setSelectedDate}
+            disabled={addPlayer}
           />
         </MuiPickersUtilsProvider>
       </Grid>
+
       <Grid item xs={12}>
         <Grid item xs={6}>
           <TextField
@@ -125,6 +142,7 @@ const SendStatus = ({ location, history }) => {
             name="opponentName"
             label="Opponent Name"
             value={opponentName}
+            disabled={addPlayer}
             onChange={handleOpponentName}
             onClick={(event) => event.stopPropagation()}
             onFocus={(event) => event.stopPropagation()}
