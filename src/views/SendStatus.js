@@ -32,8 +32,8 @@ const SendStatus = ({ location, history }) => {
   const { user, loading } = useAuth0();
   const teamId = location.state ? location.state.teamId : '';
   const userId = user ? user.subSplit : '';
-  const gameId = location.state ? location.state.gameId : '';
-  const addPlayer = location.state ? location.state.addPlayer : false;
+  const gameId = location.state && location.state.gameId ? location.state.gameId : '';
+  const addPlayer = location.state && location.state.addPlayer ? location.state.addPlayer : false;
 
   const { status, data, error } = useQuery([teamId, { userId: userId }], getTeam);
   const [players, setPlayers] = useState([]);
